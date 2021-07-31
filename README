@@ -1,0 +1,33 @@
+# 使用
+使用 com.zwk.cron.CronUtil.getNextTime(cron,date)获取给定日期的下次触发时间
+# 概念
+### 一、antlr
+通过antlr的访问器模式进行cron表达式的解析，访问到某个节点时，生成对应的表达式
+### 二、表达式
+cron最多由7部分组成 '秒 分 时 月中天 月 星期中天 年?' 其中年是可有可无的，
+每个部分是以下8中表达式中的一种，共同的父接口是CronExpression
+###### 1、'*' --> StarCronExpression
+###### 2、'?' --> QuestionCronExpression
+###### 3、带有字母'L'的 --> LastCronExpression
+###### 4、'1,2,3,4...' --> SetCronExpression
+###### 5、'1-5' --> IntervalCronExpression
+###### 6、'1/5' --> StepCronExpression
+###### 7、带有字母'W'的 --> WorkDayCronExpression
+###### 8、'3#3' --> HashCronExpression
+### 三、两个枚举
+###### 1、ExpressionTime 表达式类型 即以上的8种表达式
+###### 2、TimeType 时间类型，有两个方法：1、当前时间类型是否支持表达式类型； 2、当前时间类型支持的数字范围是多少
+# 解析流程
+从年开始一直往下计算
+年-->月-->日-->时-->分-->秒
+遇到不符合表达式的在从年开始计算
+月中天和星期中天最多出现一个需要计算的
+所以当判断月中天是StarCronExpression或QuestionCronExpression
+则只需要计算星期中天即可，如果计算失败则最终返回的日期为null
+
+流程控制参见CronExpression的up和down方法
+
+具体的解析方式参见每个CronExpression具体实现的calculate方法
+
+
+![图片alt](流程图.png)
